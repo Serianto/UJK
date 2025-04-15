@@ -28,22 +28,29 @@ class _RegisScreenState extends State<RegisScreen> {
         'password' : password,
       };
 
-      var response = await myHttp.post(Uri.parse(Api.baseUrl + Api.register),
-      body: body);
+      var response = await myHttp.post(Uri.parse('${Api.baseUrl}${Api.register}'),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: body);
 
       if(response.statusCode == 401){
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ada yang salah')));
       } else {
+        print('Response status: ${response.statusCode}');
+        print('Response body: ${response.body}');
         register = Register.fromJson(json.decode(response.body));
-        saveUser(register.email, register.name);
+        saveUser(register.email, register.name, register.password);
       }
     }
 
-    Future<void> saveUser(String email, String name) async{
+    Future<void> saveUser(String email, String name, String password) async{
       try{
         final SharedPreferences pref = await _prefs;
         pref.setString('email', email);
         pref.setString('name', name);
+        pref.setString('password', password);
 
         Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginPage())).then((value){
           setState(() {});
