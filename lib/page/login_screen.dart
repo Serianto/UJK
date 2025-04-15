@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:absensi/api/api.dart';
 import 'package:absensi/handler/absent.dart';
 import 'package:absensi/page/home_screen.dart';
+import 'package:absensi/page/regis_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as myHttp;
@@ -103,7 +104,11 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: () {
                     login(emailController.text, passwordController.text);
                   }, 
-                  child: Text('Masuk'))
+                  child: Text('Masuk')),
+                
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => RegisScreen())) , 
+                  child: Text('Register'))
               ],
             ),
           ),)),

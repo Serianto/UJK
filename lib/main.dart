@@ -1,4 +1,4 @@
-import 'package:absensi/page/login_regis_screen.dart';
+import 'package:absensi/page/login_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
