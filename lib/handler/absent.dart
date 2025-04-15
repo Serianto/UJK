@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Register {
   String name;
   String email;
@@ -18,6 +20,9 @@ class Register {
   }
 }
 
+Login loginFromJson(String str) => Login.fromJson(jsonDecode(str));
+String loginToJson(Login data) => json.encode(data.toJson());
+
 class Login{
   String email;
   String password;
@@ -27,12 +32,20 @@ class Login{
     required this.password,
   });
 
-  Map<String, dynamic> toMap(){
+  Map<String, dynamic> toJson(){
     return{
       'email' : email,
       'password' : password,
     };
   }
+
+  factory Login.fromJson(Map<String, dynamic> json) {
+    return Login(
+      email: json['email'],
+      password: json['password'],
+    );
+  }
+
 }
 
 class Checkin{
