@@ -56,14 +56,16 @@ class Login{
 
 }
 
-class Checkin{
+class Checkin {
+  bool success;
   String checkInLat;
-  String checkInLng; 
+  String checkInLng;
   String checkInAddress;
   String status;
   String alasanIzin;
 
   Checkin({
+    required this.success,
     required this.checkInLat,
     required this.checkInLng,
     required this.checkInAddress,
@@ -71,14 +73,26 @@ class Checkin{
     required this.alasanIzin,
   });
 
-  Map<String, dynamic> toMap(){
-    return{
-      'checkInLat' : checkInLat,
-      'checkInLng' : checkInLng,
-      'checkInAdress' : checkInAddress,
-      'status' : status,
-      'alasanizin' : alasanIzin,
+  Map<String, dynamic> toJson() {
+    return {
+      'success': success,
+      'checkInLat': checkInLat,
+      'checkInLng': checkInLng,
+      'checkInAddress': checkInAddress, // typo diperbaiki dari 'checkInAdress'
+      'status': status,
+      'alasanIzin': alasanIzin, // konsisten dengan camelCase
     };
+  }
+
+  factory Checkin.fromJson(Map<String, dynamic> json) {
+    return Checkin(
+      success: json['success'] ?? '',
+      checkInLat: json['checkInLat'] ?? '',
+      checkInLng: json['checkInLng'] ?? '',
+      checkInAddress: json['checkInAddress'] ?? '',
+      status: json['status'] ?? '',
+      alasanIzin: json['alasanIzin'] ?? '',
+    );
   }
 }
 
@@ -167,10 +181,17 @@ class User{
     required this.password,
   });
 
-  Map<String, dynamic> toMap(){
-    return{
-      'email' : email,
-      'password' : password,
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      email: json['email'],
+      password: json['password'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'email': email,
+      'password': password,
     };
   }
 }
