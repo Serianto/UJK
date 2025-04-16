@@ -38,42 +38,53 @@ class _LoginPageState extends State<LoginPage> {
     String nameStr = await name;
     if (tokenStr != '' && nameStr != ''){
       Future.delayed(Duration(seconds: 2), () async{
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyWidget())).then((value){
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen())).then((value){
           setState(() {});
         });
       });
     }
   }
 
-  Future login(email, password) async{
-    Login? login;
-    Map<String, String> body = {'email' : email, 'password' : password};
-    var response = await myHttp.post(Uri.parse(Api.baseUrl + Api.login),
-    body: body);
+Future login(email, password) async {
+  Map<String, String> body = {'email': email, 'password': password};
+  var response = await myHttp.post(Uri.parse(Api.baseUrl + Api.login), body: body);
 
-    if(response.statusCode == 401){
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ada yang salah')));
-    } else {
-      login = Login.fromJson(json.decode(response.body));
-      print('Hasil' + response.body);
-      saveUser(login.email, login.password);
-    }
-  }
+  print('🔥 JSON response: ${response.body}');
 
-  Future saveUser(token, name) async{         
-    try{
-      print('Disini' + token + ' | ' + name);
-      final SharedPreferences pref = await _prefs;
-      pref.setString('name', name);
-      pref.setString('token', token);
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyWidget())).then((value){
-        setState(() {});
-      });
-    } catch(err){
-      print('Error :' + err.toString());
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err.toString())));
-    }
+  if (response.statusCode == 401) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ada yang salah')));
+  } else {
+    var jsonData = json.decode(response.body);
+    var user = jsonData['data']['user'];
+    String token = jsonData['data']['token'];
+    String email = user['email'] ?? '';
+    String name = user['name'] ?? '';
+
+    print('✅ Email: $email');
+    print('✅ Name: $name');
+    print('✅ Token: $token');
+
+    saveUser(token, name, email);
   }
+}
+
+Future saveUser(String token, String name, String email) async {
+  try {
+    print('Disini $token | $email');
+    final SharedPreferences pref = await _prefs;
+    pref.setString('token', token);
+    pref.setString('name', name);
+    pref.setString('email', email); // ← simpan email juga
+
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen())).then((value) {
+      setState(() {});
+    });
+  } catch (err) {
+    print('Error :' + err.toString());
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err.toString())));
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

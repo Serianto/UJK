@@ -8,4 +8,5 @@ class Api {
   static const String profile_edit = '/profile';
   static const String history = '/absen/history';
   static const String user = '/users';
+  static String token = '';
 }
