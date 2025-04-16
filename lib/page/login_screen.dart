@@ -38,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
     String nameStr = await name;
     if (tokenStr != '' && nameStr != ''){
       Future.delayed(Duration(seconds: 2), () async{
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyWidget())).then((value){
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen())).then((value){
           setState(() {});
         });
       });
@@ -66,7 +66,7 @@ class _LoginPageState extends State<LoginPage> {
       final SharedPreferences pref = await _prefs;
       pref.setString('name', name);
       pref.setString('token', token);
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyWidget())).then((value){
+      Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen())).then((value){
         setState(() {});
       });
     } catch(err){

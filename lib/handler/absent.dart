@@ -28,76 +28,36 @@ class Register {
   }
 }
 
-class Login {
-  final String token;
-  final String email;
-  final String name;
-  final String password;  // Menambahkan field password
+Login loginFromJson(String str) => Login.fromJson(jsonDecode(str));
+String loginToJson(Login data) => json.encode(data.toJson());
+
+class Login{
+  String email;
+  String password;
 
   Login({
-    required this.token,
     required this.email,
-    required this.name,
-    required this.password,  // Pastikan password juga diberikan saat konstruktor
+    required this.password,
   });
 
-  // Mengupdate factory method fromJson untuk menangani password
-  factory Login.fromJson(Map<String, dynamic> json) {
-    final user = json['data']['user'] ?? {}; // Mengatasi jika 'user' tidak ada atau null
+  Map<String, dynamic> toJson(){
+    return{
+      'email' : email,
+      'password' : password,
+    };
+  }
 
+  factory Login.fromJson(Map<String, dynamic> json) {
     return Login(
-      token: json['data']['token'] ?? '', // Pastikan token tidak null
-      email: user['email'] ?? '', // Pastikan email tidak null
-      name: user['name'] ?? '', // Pastikan name tidak null
-      password: '',  // Biasanya password tidak dikirimkan dalam response, jadi beri nilai default kosong
+      email: json['email'],
+      password: json['password'],
     );
   }
 
-  // Method toJson untuk mengonversi objek Login kembali ke format JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'token': token,
-      'email': email,
-      'name': name,
-      'password': password, // Menambahkan password saat konversi ke JSON
-    };
-  }
 }
 
-<<<<<<< HEAD
 class Checkin {
   bool success;
-=======
-// Login loginFromJson(String str) => Login.fromJson(jsonDecode(str));
-// String loginToJson(Login data) => json.encode(data.toJson());
-
-// class Login{
-//   String email;
-//   String password;
-
-//   Login({
-//     required this.email,
-//     required this.password,
-//   });
-
-//   Map<String, dynamic> toJson(){
-//     return{
-//       'email' : email,
-//       'password' : password,
-//     };
-//   }
-
-//   factory Login.fromJson(Map<String, dynamic> json) {
-//     return Login(
-//       email: json['email'],
-//       password: json['password'],
-//     );
-//   }
-
-// }
-
-class Checkin{
->>>>>>> 33f04f7aefc06dc7346e933eba847ae04a103ba2
   String checkInLat;
   String checkInLng;
   String checkInAddress;
