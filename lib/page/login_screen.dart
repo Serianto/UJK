@@ -98,7 +98,12 @@ class _LoginPageState extends State<LoginPage> {
                                 if(loginmodel.errorMessage.isNotEmpty)
                                 Padding(
                                   padding: EdgeInsets.only(top: 8),
-                                  child: Text(loginmodel.errorMessage, style: TextStyle(color: tujuh),),)
+                                  child: Text(loginmodel.errorMessage, style: TextStyle(color: tujuh))),
+
+                                  TextButton(
+                                    onPressed: (){
+                                      Navigator.pushNamed(context, '/register');
+                                    }, child: Text('Regist'))
                             ],
                           );
                         })))

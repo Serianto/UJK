@@ -57,7 +57,9 @@ class _ProfilScreenState extends State<ProfilScreen> {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => EditScreen()));
                 }, 
                 child: Text('Edit'))
-            ],),)
+            ],
+          ),
+        ),
     );
   }
 }
