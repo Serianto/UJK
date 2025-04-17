@@ -1,8 +1,12 @@
 //import 'package:absensi/page/home_screen.dart';
+import 'package:absensi/model/home_model.dart';
+import 'package:absensi/model/login_model.dart';
+import 'package:absensi/page/home_screen.dart';
 import 'package:absensi/page/login_screen.dart';
 import 'package:absensi/page/profil_screen.dart';
 import 'package:absensi/page/regis_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,16 +18,23 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-       return MaterialApp(
+       return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (context) => LoginModel()),
+          ChangeNotifierProvider(create: (context) => HomeModel())
+        ], 
+       child: MaterialApp(
         title: 'My App',
         initialRoute: '/login',
         routes: {
           '/login': (context) => LoginPage(),
           '/users': (context) => ProfilScreen(),
-          '/register': (context) => RegisScreen()
+          '/register': (context) => RegisScreen(),
+          '/home': (context) => HomeScreen(),
           
       },
-    );
+    ),
+  );
     // return MaterialApp(
     //   title: 'Flutter Demo',
     //   theme: ThemeData(

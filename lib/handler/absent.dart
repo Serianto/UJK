@@ -1,4 +1,4 @@
-import 'dart:convert';
+//import 'dart:convert';
 
 class Register {
   String name;
@@ -28,32 +28,58 @@ class Register {
   }
 }
 
-Login loginFromJson(String str) => Login.fromJson(jsonDecode(str));
-String loginToJson(Login data) => json.encode(data.toJson());
+class LoginResponse {
+  final String message;
+  final LoginData? data;
 
-class Login{
-  String email;
-  String password;
+  LoginResponse({required this.message, this.data});
 
-  Login({
-    required this.email,
-    required this.password,
-  });
-
-  Map<String, dynamic> toJson(){
-    return{
-      'email' : email,
-      'password' : password,
-    };
-  }
-    
-  factory Login.fromJson(Map<String, dynamic> json) {
-    return Login(
-      email: json['email'],
-      password: json['password'],
+  factory LoginResponse.fromJson(Map<String, dynamic> json) {
+    return LoginResponse(
+      message: json['message'],
+      data: json['data'] != null ? LoginData.fromJson(json['data']) : null,
     );
   }
+}
 
+class LoginData {
+  final String token;
+  final User user;
+
+  LoginData({required this.token, required this.user});
+
+  factory LoginData.fromJson(Map<String, dynamic> json) {
+    return LoginData(token: json['token'], user: User.fromJson(json['user']));
+  }
+}
+
+class User {
+  final int id;
+  final String name;
+  final String email;
+  final String? emailVerifiedAt;
+  final String createdAt;
+  final String updatedAt;
+
+  User({
+    required this.id,
+    required this.name,
+    required this.email,
+    this.emailVerifiedAt,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['id'],
+      name: json['name'],
+      email: json['email'],
+      emailVerifiedAt: json['email_verified_at'],
+      createdAt: json['created_at'],
+      updatedAt: json['updated_at'],
+    );
+  }
 }
 
 class Checkin {
@@ -172,26 +198,26 @@ class History{
   }
 }
 
-class User{
-  String email;
-  String password;
+// class User{
+//   String email;
+//   String password;
 
-  User({
-    required this.email,
-    required this.password,
-  });
+//   User({
+//     required this.email,
+//     required this.password,
+//   });
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
-      email: json['email'],
-      password: json['password'],
-    );
-  }
+//   factory User.fromJson(Map<String, dynamic> json) {
+//     return User(
+//       email: json['email'],
+//       password: json['password'],
+//     );
+//   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'email': email,
-      'password': password,
-    };
-  }
-}
+//   Map<String, dynamic> toJson() {
+//     return {
+//       'email': email,
+//       'password': password,
+//     };
+//   }
+// }

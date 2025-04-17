@@ -30,7 +30,7 @@ class AuthService {
       Uri.parse(Api.baseUrl + Api.login),
       body: {'email': email, 'password': password},
     );
-
+    print('API Login Response Body: ${response.body}');
     final loginResponse = LoginResponse.fromJson(json.decode(response.body));
 
     if (loginResponse.data != null) {
