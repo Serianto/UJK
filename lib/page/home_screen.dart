@@ -1,5 +1,3 @@
-//import 'package:absensi/handler/absent.dart';
-import 'package:absensi/handler/user.dart';
 import 'package:absensi/model/home_model.dart';
 import 'package:absensi/page/save_page.dart';
 import 'package:absensi/utils/color.dart';
@@ -21,40 +19,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
     
   }
-  // final UserService _userService = UserService();
-  // final AuthService _authService = AuthService();
-  // // Map<String, dynamic> _profilData = {};
-  //bool _isLoading = true;
-
-//   @override
-//   void initState() {
-//     // TODO: implement initState
-//     super.initState();
-//     _fetchProfil();
-//   }
-
-// Future<void> _fetchProfil() async {
-//   try {
-//     final token = await _userService.getToken();
-//     if (token == null) {
-//       Navigator.pushReplacementNamed(context, '/login');
-//       return;
-//     }
-
-//     final response = await _authService.getProfile();
-//     print('📥 Profil Response: $response');
-
-//     setState(() {
-//       _profilData = response['data']['user'];
-//       _isLoading = false;
-//     });
-//   } catch (e) {
-//     setState(() {
-//       _isLoading = false;
-//     });
-//     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal memuat profil: $e')));
-//   }
-// }
 
   @override
   Widget build(BuildContext context) {
@@ -105,8 +69,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     }, 
                     child: Text('Absen'))
                 ],
-              ),),
+              ),
+            ),
           );
-        })
+        }
+      )
     );
-    }}
+  }
+}

@@ -95,7 +95,7 @@ class AuthService {
   Future<Map<String, dynamic>> getProfile() async {
     final token = await _userService.getToken();
     final response = await http.get(
-      Uri.parse(Api.baseUrl + Api.user),
+      Uri.parse(Api.baseUrl + Api.profile_edit),
       headers: {'Authorization': 'Bearer $token'},
     );
     return json.decode(response.body);

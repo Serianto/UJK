@@ -39,6 +39,7 @@ class HomeModel with ChangeNotifier {
         return;
       }
       final response = await _authservice.getProfile();
+      print('Profile API response: $response');
       setProfilData(response['data']);
     } catch (e) {
       setErrorMessage('Gagal: $e');
