@@ -65,6 +65,16 @@ class SaveModel with ChangeNotifier {
     notifyListeners();
   }
 
+  void removeHistoryAt(int index) {
+  _history.removeAt(index);
+  notifyListeners();
+  }
+
+  void clearHistory() {
+  _history.clear();
+  notifyListeners();
+  }
+
   Future<LatLng?> getCurrentLocation() async {
     try {
       Position position = await Geolocator.getCurrentPosition(
