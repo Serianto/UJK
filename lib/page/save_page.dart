@@ -1,13 +1,8 @@
-import 'dart:convert';
-
-import 'package:absensi/api/api.dart';
-import 'package:absensi/handler/absent.dart';
+import 'package:absensi/model/save_model.dart';
 import 'package:absensi/utils/color.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as Http;
-import 'package:location/location.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:syncfusion_flutter_maps/maps.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
 
 class SavePage extends StatefulWidget {
   const SavePage({super.key});
@@ -17,118 +12,170 @@ class SavePage extends StatefulWidget {
 }
 
 class _SavePageState extends State<SavePage> {
-  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-  late Future<String> _token;
+  Future<LatLng?>? _locationFuture;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _token = _prefs.then((SharedPreferences prefs){
-      return prefs.getString('token') ?? '';
-    });
+    _locationFuture = Provider.of<SaveModel>(context, listen: false).getCurrentLocation();
   }
-
-  Future<LocationData?> _currenctLocation() async {
-    bool serviceEnable;
-    PermissionStatus permissionGranted;
-
-    Location location = new Location();
-
-    serviceEnable = await location.serviceEnabled();
-
-    if(!serviceEnable) {
-      serviceEnable = await location.requestService();
-      if(!serviceEnable) {
-        return null;
-      }
-    }
-
-    permissionGranted = await location.hasPermission();
-    if(permissionGranted == PermissionStatus.denied){
-      permissionGranted = await location.requestPermission();
-      if(permissionGranted != PermissionStatus.granted){
-        return null;
-      }
-    }
-
-    return await location.getLocation();
-  }
-
-  Future saveAbsen(latitude, longitude) async {
-    Checkin checkin;
-    Map<String, String> body = {
-      'latitude': latitude.toString(),
-      'longitude': longitude.toString()
-    };
-
-    Map<String, String> headers = {'Authorization' : 'Bearer' + await _token};
-
-    var response = await Http.post(Uri.parse(Api.baseUrl + Api.checkin),
-    body: body,
-    headers: headers);
-
-    checkin = Checkin.fromJson(json.decode(response.body));
-
-    if(checkin.success){
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Sukses')));
-      Navigator.pop(context);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal')));
-    }
-  }
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Absensi'),
-      ),
-      body: FutureBuilder<LocationData?>(
-        future: _currenctLocation(), 
-        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-          if(snapshot.hasData){
-            final LocationData currentLocation = snapshot.data;
-            print('Uhuyy : ' + currentLocation.latitude.toString() + ' | ' + currentLocation.longitude.toString());
-            return SafeArea(
-              child: Column(
-                children: [
-                  Container(
-                    height: 300,
-                    child: SfMaps(
-                      layers: [
-                        MapTileLayer(
-                          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                          initialFocalLatLng: MapLatLng(
-                            currentLocation.latitude!, 
-                            currentLocation.longitude!),
-                          initialZoomLevel: 15,
-                          initialMarkersCount: 1,
-                          markerBuilder: (BuildContext context, int index){
-                            return MapMarker(
-                              latitude: currentLocation.latitude!, 
-                              longitude: currentLocation.longitude!,
-                              child: Icon(Icons.location_on, color: dua));
-                          },
-                        )
-                      ]
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('Absen'),
+      backgroundColor: bg,
+      centerTitle: true,
+    ),
+    body: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Consumer<SaveModel>(
+        builder: (context, absenProvider, child) {
+          final bool isButtonEnabled = absenProvider.status == 'masuk' ||
+            (absenProvider.status == 'izin' && absenProvider.alasanIzin.trim().isNotEmpty);
+          return Column(
+            children: <Widget>[
+              // Google Map Card
+              Expanded(
+                flex: 2,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: FutureBuilder<LatLng?>(
+                      future: _locationFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        } else if (snapshot.hasError) {
+                          return Center(
+                            child: Text('Gagal mendapatkan lokasi: ${snapshot.error}'),
+                          );
+                        } else if (snapshot.data != null) {
+                          return GoogleMap(
+                            initialCameraPosition: CameraPosition(
+                              target: snapshot.data!,
+                              zoom: 15,
+                            ),
+                            markers: {
+                              Marker(
+                                markerId: const MarkerId('currentLocation'),
+                                position: snapshot.data!,
+                              ),
+                            },
+                            onMapCreated: (GoogleMapController controller) {
+                              absenProvider.setMapController(controller);
+                            },
+                          );
+                        } else {
+                          return const Center(child: Text('Lokasi belum tersedia.'));
+                        }
+                      },
                     ),
                   ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      saveAbsen(
-                        currentLocation.latitude, 
-                        currentLocation.longitude);
-                    }, 
-                    child: Text('Simpan'))
-                ],
-              )
-            );
-          } else {
-            return Center(child: CircularProgressIndicator(),);
-          }
-        }
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Dropdown status
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: lima,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: enam),
+                ),
+                child: DropdownButton<String>(
+                  value: absenProvider.status,
+                  isExpanded: true,
+                  underline: const SizedBox(),
+                  items: ['masuk', 'izin'].map((value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value.toUpperCase()),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    absenProvider.setStatus(value!);
+                  },
+                ),
+              ),
+
+              // Alasan Izin
+              if (absenProvider.status == 'izin') ...[
+                const SizedBox(height: 12),
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Alasan Izin',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onChanged: (value) {
+                    absenProvider.setAlasanIzin(value);
+                  },
+                ),
+              ],
+
+              const SizedBox(height: 24),
+
+              // Tombol absen
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.check_circle_outline),
+                  label: absenProvider.isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text('Absen'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isButtonEnabled ? satu : empat,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: (!isButtonEnabled || absenProvider.isLoading)
+                    ? null
+                    : () async {
+                        bool success = await absenProvider.checkIn(context);
+                        if (success && context.mounted) {
+                          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                        }
+                      },
+                    ),
+                  ),
+
+              // Message Feedback
+              if (absenProvider.message.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 12.0),
+                  child: Text(
+                    absenProvider.message,
+                    style: TextStyle(
+                      color: absenProvider.message.contains('berhasil')
+                          ? Colors.green
+                          : Colors.red,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
       ),
-    );
-  }
+    ),
+  );
+}
 }

@@ -1,12 +1,8 @@
-import 'dart:convert';
-
-import 'package:absensi/api/api.dart';
-import 'package:absensi/handler/absent.dart';
-import 'package:absensi/page/login_screen.dart';
-import 'package:absensi/utils/color.dart';
+import 'package:absensi/model/register_model.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as myHttp;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:lottie/lottie.dart';
+import 'package:provider/provider.dart';
+
 
 class RegisScreen extends StatefulWidget {
   const RegisScreen({super.key});
@@ -16,146 +12,137 @@ class RegisScreen extends StatefulWidget {
 }
 
 class _RegisScreenState extends State<RegisScreen> {
-    final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+    final formKey = GlobalKey<FormState>();
     TextEditingController nameController = TextEditingController();
     TextEditingController emailController = TextEditingController();
     TextEditingController passwordController = TextEditingController();
 
-    Future<void> register(String name, String email, String password) async{
-      Register? register;
-      Map<String, String> body = {
-        'name' : name,
-        'email' : email,
-        'password' : password,
-      };
-
-      var response = await myHttp.post(Uri.parse('${Api.baseUrl}${Api.register}'),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: body);
-
-      if(response.statusCode == 401){
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ada yang salah')));
-      } else {
-        print('Response status: ${response.statusCode}');
-        print('Response body: ${response.body}');
-        register = Register.fromJson(json.decode(response.body));
-        saveUser(register.email, register.name, register.password);
-      }
-    }
-
-    Future<void> saveUser(String email, String name, String password) async{
-      try{
-        final SharedPreferences pref = await _prefs;
-        pref.setString('email', email);
-        pref.setString('name', name);
-        pref.setString('password', password);
-
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginPage())).then((value){
-          setState(() {});
-        });
-      }catch(err){
-        print('Error : $err');
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err.toString())));
-      }
-    }
-
   @override
   Widget build(BuildContext context) {
-  return Scaffold(
-    backgroundColor: bg,
-    body: SafeArea(
-      child: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Text(
-                  'Register',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: dua,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
-              Text('Name', style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              TextField(
-                controller: nameController,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.person),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text('Email', style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              TextField(
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.email),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text('Password', style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.lock),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 30),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    register(
-                      nameController.text,
-                      emailController.text,
-                      passwordController.text,
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    backgroundColor: Colors.blueAccent,
-                  ),
-                  child: const Text(
-                    'Register',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                ),
-              ),
-            ],
+    return Scaffold(
+      body: Stack(
+        children: <Widget>[
+          Lottie.asset(
+            'asset/daftar.json',
           ),
-        ),
+          Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Card(
+                elevation: 8,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                color: const Color.fromARGB(255, 255, 255, 255),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Form(
+                    key: formKey,
+                    child: Consumer<RegisterModel>(
+                      builder: (context, registerProvider, child) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Text(
+                              'Registrasi',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Color.fromARGB(255, 105, 200, 212),
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            TextFormField(
+                              controller: nameController,
+                              decoration: InputDecoration(
+                                labelText: 'Nama',
+                                border: OutlineInputBorder(),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Nama wajib diisi.';
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(height: 10),
+                            TextFormField(
+                              controller: emailController,
+                              decoration: InputDecoration(
+                                labelText: 'Email',
+                                border: OutlineInputBorder(),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Email wajib diisi.';
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(height: 10),
+                            TextFormField(
+                              controller: passwordController,
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                border: OutlineInputBorder(),
+                              ),
+                              obscureText: true,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Password wajib diisi.';
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(height: 10),
+                            ElevatedButton(
+                              onPressed:
+                                  registerProvider.isLoading
+                                      ? null
+                                      : () {
+                                        if (formKey.currentState!.validate()) {
+                                          registerProvider.register(
+                                            context,
+                                            nameController.text,
+                                            emailController.text,
+                                            passwordController.text,
+                                          );
+                                        }
+                                      },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.grey[200],
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 40,
+                                  vertical: 15,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                              ),
+                              child:
+                                  registerProvider.isLoading
+                                      ? CircularProgressIndicator()
+                                      : Text('Registrasi'),
+                            ),
+                            if (registerProvider.errorMessage.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  registerProvider.errorMessage,
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
-    ),
-  );
-}
+    );
+  }
 }

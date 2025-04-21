@@ -1,10 +1,16 @@
 //import 'package:absensi/page/home_screen.dart';
+import 'package:absensi/model/edit_model.dart';
 import 'package:absensi/model/home_model.dart';
 import 'package:absensi/model/login_model.dart';
+import 'package:absensi/model/profil_model.dart';
+import 'package:absensi/model/register_model.dart';
+import 'package:absensi/model/save_model.dart';
+import 'package:absensi/page/edit_screen.dart';
 import 'package:absensi/page/home_screen.dart';
 import 'package:absensi/page/login_screen.dart';
 import 'package:absensi/page/profil_screen.dart';
 import 'package:absensi/page/regis_screen.dart';
+import 'package:absensi/page/save_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -21,7 +27,11 @@ class MyApp extends StatelessWidget {
        return MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (context) => LoginModel()),
-          ChangeNotifierProvider(create: (context) => HomeModel())
+          ChangeNotifierProvider(create: (context) => HomeModel()),
+          ChangeNotifierProvider(create: (context) => ProfilModel()),
+          ChangeNotifierProvider(create: (context) => SaveModel()),
+          ChangeNotifierProvider(create: (context) => EditModel()),
+          ChangeNotifierProvider(create: (context) => RegisterModel()),
         ], 
        child: MaterialApp(
         title: 'My App',
@@ -31,7 +41,8 @@ class MyApp extends StatelessWidget {
           '/users': (context) => ProfilScreen(),
           '/register': (context) => RegisScreen(),
           '/home': (context) => HomeScreen(),
-          
+          '/absen': (context) => SavePage(),
+          '/edit' : (context) => EditScreen(),
       },
     ),
   );
