@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:absensi/model/home_model.dart';
+import 'package:absensi/page/history_screen.dart';
 import 'package:absensi/page/save_page.dart';
 import 'package:absensi/utils/color.dart';
 import 'package:flutter/material.dart';
@@ -98,7 +99,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 leading: const Icon(Icons.history),
                 title: const Text('History'),
                 onTap: () {
-                  //Navigator.pushNamed(context, routeName);
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const HistoryScreen()),
+                      );
                 },
               )
             ],
