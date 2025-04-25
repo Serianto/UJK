@@ -81,50 +81,6 @@ Widget build(BuildContext context) {
               ),
 
               const SizedBox(height: 24),
-
-              // Dropdown status
-              // Container(
-              //   padding: const EdgeInsets.symmetric(horizontal: 16),
-              //   decoration: BoxDecoration(
-              //     color: lima,
-              //     borderRadius: BorderRadius.circular(12),
-              //     border: Border.all(color: enam),
-              //   ),
-              //   child: DropdownButton<String>(
-              //     value: absenProvider.status,
-              //     isExpanded: true,
-              //     underline: const SizedBox(),
-              //     items: ['masuk', 'izin'].map((value) {
-              //       return DropdownMenuItem<String>(
-              //         value: value,
-              //         child: Text(value.toUpperCase()),
-              //       );
-              //     }).toList(),
-              //     onChanged: (value) {
-              //       absenProvider.setStatus(value!);
-              //     },
-              //   ),
-              // ),
-
-              // // Alasan Izin
-              // if (absenProvider.status == 'izin') ...[
-              //   const SizedBox(height: 12),
-              //   TextField(
-              //     decoration: InputDecoration(
-              //       labelText: 'Alasan Izin',
-              //       border: OutlineInputBorder(
-              //         borderRadius: BorderRadius.circular(12),
-              //       ),
-              //     ),
-              //     onChanged: (value) {
-              //       absenProvider.setAlasanIzin(value);
-              //     },
-              //   ),
-              // ],
-
-              const SizedBox(height: 24),
-
-              // Tombol absen
 SizedBox(
   width: double.infinity,
   child: ElevatedButton.icon(
@@ -176,7 +132,7 @@ SizedBox(
         ? null
         : () async {
             absenProvider.setStatus('keluar');
-            bool success = await absenProvider.checkIn(context);
+            bool success = await absenProvider.checkOut(context);
             if (success && context.mounted) {
               Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
             }

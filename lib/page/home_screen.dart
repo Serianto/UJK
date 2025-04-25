@@ -89,20 +89,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.logout),
-                title: const Text('Logout'),
-                onTap: () {
-                  Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-                },
-              ),
-              ListTile(
                 leading: const Icon(Icons.history),
                 title: const Text('History'),
                 onTap: () {
                       Navigator.push(context, MaterialPageRoute(builder: (context) => const HistoryScreen()),
                       );
                 },
-              )
+              ),
+              ListTile(
+                leading: const Icon(Icons.logout),
+                title: const Text('Logout'),
+                onTap: () {
+                  Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+                },
+              ),
             ],
           ),
         ),

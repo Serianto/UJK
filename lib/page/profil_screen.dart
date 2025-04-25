@@ -19,7 +19,7 @@ class _ProfilScreenState extends State<ProfilScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance.addPersistentFrameCallback((_){
+    WidgetsBinding.instance.addPostFrameCallback((_){
       Provider.of<ProfilModel>(context, listen:false).fetchProfile(context);
     });
   }

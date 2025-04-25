@@ -1,5 +1,8 @@
 import 'package:absensi/handler/user.dart';
+import 'package:absensi/model/home_model.dart';
+import 'package:absensi/model/profil_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class EditModel with ChangeNotifier {
     final AuthService _authService = AuthService();
@@ -19,18 +22,26 @@ class EditModel with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> editProfile(BuildContext context, String name) async {
-    setLoading(true);
-    try {
-      final response = await _authService.updateProfile(name);
-      setMessage(response['message']);
-      if (response['message'] == 'Profil berhasil diperbarui') {
-        Navigator.pop(context); // Kembali ke halaman profil
-      }
-    } catch (e) {
-      setMessage('Gagal memperbarui profil: $e');
-    } finally {
-      setLoading(false);
+Future<void> editProfile(BuildContext context, String name) async {
+  setLoading(true);
+  try {
+    final response = await _authService.updateProfile(name);
+    setMessage(response['message']);
+
+    if (response['message'] == '') {
+      // Refresh profil di layar profil
+      await Provider.of<ProfilModel>(context, listen: false).fetchProfile(context);
+
+      // Refresh profil di HomeScreen
+      await Provider.of<HomeModel>(context, listen: false).fetchProfil(context);
+
+      // Tutup halaman edit
+      Navigator.pop(context);
     }
+  } catch (e) {
+    setMessage('Gagal memperbarui profil: $e');
+  } finally {
+    setLoading(false);
   }
+}
 }
