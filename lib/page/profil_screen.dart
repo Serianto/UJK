@@ -1,4 +1,5 @@
 import 'package:absensi/page/edit_screen.dart';
+import 'package:absensi/utils/color.dart';
 import 'package:flutter/material.dart';
 import 'package:absensi/model/profil_model.dart';
 import 'package:provider/provider.dart';
@@ -31,7 +32,7 @@ Widget build(BuildContext context) {
     appBar: AppBar(
       title: const Text('Profil'),
       centerTitle: true,
-      backgroundColor: Colors.blueAccent,
+      backgroundColor: bg,
     ),
     body: Consumer<ProfilModel>(
       builder: (context, profilModel, child) {
@@ -84,7 +85,7 @@ Widget build(BuildContext context) {
                     icon: const Icon(Icons.edit),
                     label: const Text('Edit Profil'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
+                      backgroundColor: enam,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
