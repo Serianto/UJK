@@ -101,12 +101,18 @@ class AuthService {
     return json.decode(response.body);
   }
 
-  Future<Map<String, dynamic>> updateProfile(String name) async {
+  Future<Map<String, dynamic>> updateProfile(String name, String email) async {
     final token = await _userService.getToken();
     final response = await http.put(
       Uri.parse(Api.baseUrl + Api.profile_edit),
-      headers: {'Authorization': 'Bearer $token'},
-      body: {'name': name},
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/x-www-form-urlencoded', // penting jika pakai form body
+      },
+      body: {
+        'name': name,
+        'email': email,
+      },
     );
     return json.decode(response.body);
   }

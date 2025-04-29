@@ -219,17 +219,48 @@ class SaveModel with ChangeNotifier {
 }
 
 
-
-// Struktur Riwayat Absen
 class AbsenHistoryItem {
   final String status;
   final String? alasan;
   final DateTime waktu;
+  final double? checkInLat;
+  final double? checkInLng;
+  final double? checkOutLat;
+  final double? checkOutLng;
 
   AbsenHistoryItem({
     required this.status,
     this.alasan,
     required this.waktu,
+    this.checkInLat,
+    this.checkInLng,
+    this.checkOutLat,
+    this.checkOutLng,
   });
+
+  factory AbsenHistoryItem.fromJson(Map<String, dynamic> json) {
+    return AbsenHistoryItem(
+      status: json['status'],
+      alasan: json['alasan'],
+      waktu: DateTime.parse(json['waktu']),
+      checkInLat: json['check_in_lat'] != null ? json['check_in_lat'].toDouble() : null,
+      checkInLng: json['check_in_lng'] != null ? json['check_in_lng'].toDouble() : null,
+      checkOutLat: json['check_out_lat'] != null ? json['check_out_lat'].toDouble() : null,
+      checkOutLng: json['check_out_lng'] != null ? json['check_out_lng'].toDouble() : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'status': status,
+      'alasan': alasan,
+      'waktu': waktu.toIso8601String(),
+      'check_in_lat': checkInLat,
+      'check_in_lng': checkInLng,
+      'check_out_lat': checkOutLat,
+      'check_out_lng': checkOutLng,
+    };
+  }
 }
+
 

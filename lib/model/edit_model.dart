@@ -22,21 +22,31 @@ class EditModel with ChangeNotifier {
     notifyListeners();
   }
 
-Future<void> editProfile(BuildContext context, String name) async {
+  Future<void> editProfile(BuildContext context, String name, String email) async {
   setLoading(true);
   try {
-    final response = await _authService.updateProfile(name);
+    final response = await _authService.updateProfile(name, email);
     setMessage(response['message']);
 
-    if (response['message'] == '') {
-      // Refresh profil di layar profil
+    if (response['message'].toLowerCase().contains('berhasil')) {
       await Provider.of<ProfilModel>(context, listen: false).fetchProfile(context);
-
-      // Refresh profil di HomeScreen
       await Provider.of<HomeModel>(context, listen: false).fetchProfil(context);
 
-      // Tutup halaman edit
-      Navigator.pop(context);
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Berhasil"),
+          content: const Text("Profil berhasil diubah, silakan login ulang."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+              },
+              child: const Text("OK"),
+            )
+          ],
+        ),
+      );
     }
   } catch (e) {
     setMessage('Gagal memperbarui profil: $e');
@@ -44,4 +54,48 @@ Future<void> editProfile(BuildContext context, String name) async {
     setLoading(false);
   }
 }
+
+  // Future<bool> editProfile(BuildContext context, String name, String email) async {
+  //   setLoading(true);
+  //   try {
+  //     final response = await _authService.updateProfile(name, email);
+  //     setMessage(response['message']);
+
+  //     if (response['message'] == '') {
+  //       // Refresh profil
+  //       await Provider.of<ProfilModel>(context, listen: false).fetchProfile(context);
+  //       await Provider.of<HomeModel>(context, listen: false).fetchProfil(context);
+  //       return true; // Berhasil
+  //     }
+  //   } catch (e) {
+  //     setMessage('Gagal memperbarui profil: $e');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  //   return false; // Gagal
+  // }
+
+
+// Future<void> editProfile(BuildContext context, String name) async {
+//   setLoading(true);
+//   try {
+//     final response = await _authService.updateProfile(name);
+//     setMessage(response['message']);
+
+//     if (response['message'] == '') {
+//       // Refresh profil di layar profil
+//       await Provider.of<ProfilModel>(context, listen: false).fetchProfile(context);
+
+//       // Refresh profil di HomeScreen
+//       await Provider.of<HomeModel>(context, listen: false).fetchProfil(context);
+
+//       // Tutup halaman edit
+//       Navigator.pop(context);
+//     }
+//   } catch (e) {
+//     setMessage('Gagal memperbarui profil: $e');
+//   } finally {
+//     setLoading(false);
+//   }
+// }
 }

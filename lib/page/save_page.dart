@@ -32,20 +32,21 @@ Widget build(BuildContext context) {
       padding: const EdgeInsets.all(16.0),
       child: Consumer<SaveModel>(
         builder: (context, absenProvider, child) {
-          final bool isButtonEnabled = absenProvider.status == 'masuk' ||
-            (absenProvider.status == 'izin' && absenProvider.alasanIzin.trim().isNotEmpty);
           return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              // Google Map Card
+              const Text(
+                'Lokasi Anda Saat Ini :',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+              ),
+              const SizedBox(height: 8),
               Expanded(
                 flex: 2,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    elevation: 6,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     child: FutureBuilder<LatLng?>(
                       future: _locationFuture,
                       builder: (context, snapshot) {
@@ -59,7 +60,7 @@ Widget build(BuildContext context) {
                           return GoogleMap(
                             initialCameraPosition: CameraPosition(
                               target: snapshot.data!,
-                              zoom: 15,
+                              zoom: 16,
                             ),
                             markers: {
                               Marker(
@@ -67,9 +68,7 @@ Widget build(BuildContext context) {
                                 position: snapshot.data!,
                               ),
                             },
-                            onMapCreated: (GoogleMapController controller) {
-                              absenProvider.setMapController(controller);
-                            },
+                            onMapCreated: (controller) => absenProvider.setMapController(controller),
                           );
                         } else {
                           return const Center(child: Text('Lokasi belum tersedia.'));
@@ -79,135 +78,211 @@ Widget build(BuildContext context) {
                   ),
                 ),
               ),
-
               const SizedBox(height: 24),
-SizedBox(
-  width: double.infinity,
-  child: ElevatedButton.icon(
-    icon: const Icon(Icons.login),
-    label: absenProvider.isLoading && absenProvider.status == 'masuk'
-        ? const SizedBox(
-            height: 20,
-            width: 20,
-            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-          )
-        : const Text('Absen Masuk'),
-    style: ElevatedButton.styleFrom(
-      backgroundColor: satu,
-      padding: const EdgeInsets.symmetric(vertical: 14),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-    ),
-    onPressed: absenProvider.isLoading
-        ? null
-        : () async {
-            absenProvider.setStatus('masuk');
-            bool success = await absenProvider.checkIn(context);
-            if (success && context.mounted) {
-              Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-            }
-          },
-  ),
-),
-
-const SizedBox(height: 12),
-
-// Tombol Absen Keluar
-SizedBox(
-  width: double.infinity,
-  child: ElevatedButton.icon(
-    icon: const Icon(Icons.logout),
-    label: absenProvider.isLoading && absenProvider.status == 'keluar'
-        ? const SizedBox(
-            height: 20,
-            width: 20,
-            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-          )
-        : const Text('Absen Keluar'),
-    style: ElevatedButton.styleFrom(
-      backgroundColor: Colors.blue,
-      padding: const EdgeInsets.symmetric(vertical: 14),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-    ),
-    onPressed: absenProvider.isLoading
-        ? null
-        : () async {
-            absenProvider.setStatus('keluar');
-            bool success = await absenProvider.checkOut(context);
-            if (success && context.mounted) {
-              Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-            }
-          },
-  ),
-),
-
-const SizedBox(height: 12),
-
-// Tombol Izin (dengan popup alasan)
-SizedBox(
-  width: double.infinity,
-  child: ElevatedButton.icon(
-    icon: const Icon(Icons.info_outline),
-    label: const Text('Izin'),
-    style: ElevatedButton.styleFrom(
-      backgroundColor: Colors.orange,
-      padding: const EdgeInsets.symmetric(vertical: 14),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-    ),
-    onPressed: () {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          String alasan = '';
-          return AlertDialog(
-            title: const Text('Alasan Izin'),
-            content: TextField(
-              decoration: const InputDecoration(hintText: 'Masukkan alasan'),
-              onChanged: (value) => alasan = value,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Batal'),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      icon: absenProvider.isLoading && absenProvider.status == 'masuk'
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                            )
+                          : const Icon(Icons.login),
+                      label: const Text('Absen Masuk'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: satu,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        textStyle: const TextStyle(fontSize: 16),
+                      ),
+                      onPressed: absenProvider.isLoading
+                          ? null
+                          : () async {
+                              absenProvider.setStatus('masuk');
+                              bool success = await absenProvider.checkIn(context);
+                              if (success && context.mounted) {
+                                Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                              }
+                            },
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      icon: absenProvider.isLoading && absenProvider.status == 'keluar'
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                            )
+                          : const Icon(Icons.logout),
+                      label: const Text('Absen Keluar'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        textStyle: const TextStyle(fontSize: 16),
+                      ),
+                      onPressed: absenProvider.isLoading
+                          ? null
+                          : () async {
+                              absenProvider.setStatus('keluar');
+                              bool success = await absenProvider.checkOut(context);
+                              if (success && context.mounted) {
+                                Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+                              }
+                            },
+                    ),
+                  ),
+                ],
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  if (alasan.trim().isEmpty) return;
-                  Navigator.of(context).pop();
-                  absenProvider.setStatus('izin');
-                  absenProvider.setAlasanIzin(alasan);
-                  bool success = await absenProvider.checkIn(context);
-                  if (success && context.mounted) {
-                    Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-                  }
-                },
-                child: const Text('Kirim Izin'),
-              ),
-            ],
-          );
-        },
-      );
-    },
-  ),
-),
-              // Message Feedback
               if (absenProvider.message.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 12.0),
                   child: Text(
                     absenProvider.message,
                     style: TextStyle(
-                      color: absenProvider.message.contains('berhasil')
-                          ? Colors.green
-                          : Colors.red,
+                      color: absenProvider.message.contains('berhasil') ? Colors.green : Colors.red,
                       fontWeight: FontWeight.bold,
                     ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
             ],
           );
         },
       ),
-    ),
+    )
+    // body: Padding(
+    //   padding: const EdgeInsets.all(16.0),
+    //   child: Consumer<SaveModel>(
+    //     builder: (context, absenProvider, child) {
+    //       return Column(
+    //         children: <Widget>[
+    //           // Google Map Card
+    //           Expanded(
+    //             flex: 2,
+    //             child: ClipRRect(
+    //               borderRadius: BorderRadius.circular(12),
+    //               child: Card(
+    //                 elevation: 4,
+    //                 shape: RoundedRectangleBorder(
+    //                   borderRadius: BorderRadius.circular(12),
+    //                 ),
+    //                 child: FutureBuilder<LatLng?>(
+    //                   future: _locationFuture,
+    //                   builder: (context, snapshot) {
+    //                     if (snapshot.connectionState == ConnectionState.waiting) {
+    //                       return const Center(child: CircularProgressIndicator());
+    //                     } else if (snapshot.hasError) {
+    //                       return Center(
+    //                         child: Text('Gagal mendapatkan lokasi: ${snapshot.error}'),
+    //                       );
+    //                     } else if (snapshot.data != null) {
+    //                       return GoogleMap(
+    //                         initialCameraPosition: CameraPosition(
+    //                           target: snapshot.data!,
+    //                           zoom: 15,
+    //                         ),
+    //                         markers: {
+    //                           Marker(
+    //                             markerId: const MarkerId('currentLocation'),
+    //                             position: snapshot.data!,
+    //                           ),
+    //                         },
+    //                         onMapCreated: (GoogleMapController controller) {
+    //                           absenProvider.setMapController(controller);
+    //                         },
+    //                       );
+    //                     } else {
+    //                       return const Center(child: Text('Lokasi belum tersedia.'));
+    //                     }
+    //                   },
+    //                 ),
+    //               ),
+    //             ),
+    //           ),
+    //           const SizedBox(height: 24),
+    //           SizedBox(
+    //             width: double.infinity,
+    //             child: ElevatedButton.icon(
+    //               icon: const Icon(Icons.login),
+    //               label: absenProvider.isLoading && absenProvider.status == 'masuk'
+    //                   ? const SizedBox(
+    //                       height: 20,
+    //                       width: 20,
+    //                       child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+    //                     )
+    //                   : const Text('Absen Masuk'),
+    //               style: ElevatedButton.styleFrom(
+    //                 backgroundColor: satu,
+    //                 padding: const EdgeInsets.symmetric(vertical: 14),
+    //                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    //               ),
+    //               onPressed: absenProvider.isLoading
+    //                   ? null
+    //                   : () async {
+    //                       absenProvider.setStatus('masuk');
+    //                       bool success = await absenProvider.checkIn(context);
+    //                       if (success && context.mounted) {
+    //                         Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+    //                       }
+    //                     },
+    //             ),
+    //           ),
+
+    //           const SizedBox(height: 12),
+
+    //           // Tombol Absen Keluar
+    //           SizedBox(
+    //             width: double.infinity,
+    //             child: ElevatedButton.icon(
+    //               icon: const Icon(Icons.logout),
+    //               label: absenProvider.isLoading && absenProvider.status == 'keluar'
+    //                   ? const SizedBox(
+    //                       height: 20,
+    //                       width: 20,
+    //                       child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+    //                     )
+    //                   : const Text('Absen Keluar'),
+    //               style: ElevatedButton.styleFrom(
+    //                 backgroundColor: Colors.blue,
+    //                 padding: const EdgeInsets.symmetric(vertical: 14),
+    //                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    //               ),
+    //               onPressed: absenProvider.isLoading
+    //                   ? null
+    //                   : () async {
+    //                       absenProvider.setStatus('keluar');
+    //                       bool success = await absenProvider.checkOut(context);
+    //                       if (success && context.mounted) {
+    //                         Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+    //                       }
+    //                     },
+    //             ),
+    //           ),
+    //           const SizedBox(height: 12),
+    //           if (absenProvider.message.isNotEmpty)
+    //             Padding(
+    //               padding: const EdgeInsets.only(top: 12.0),
+    //               child: Text(
+    //                 absenProvider.message,
+    //                 style: TextStyle(
+    //                   color: absenProvider.message.contains('berhasil')
+    //                       ? Colors.green
+    //                       : Colors.red,
+    //                   fontWeight: FontWeight.bold,
+    //                 ),
+    //               ),
+    //             ),
+    //         ],
+    //       );
+    //     },
+    //   ),
+    // ),
   );
 }
 }
